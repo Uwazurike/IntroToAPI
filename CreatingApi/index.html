@@ -1,0 +1,85 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Movies</title>
+    <meta charset="utf-8" />
+</head>
+<body>
+    <h2>All Movies</h2>
+
+    <ul id="movies"></ul>
+
+    <h2>Movie by Id</h2>
+    <input type="text" id="moviId" size="5" />
+    <input type="button" value="Search" onclick="find();" />
+
+    <p id="movie">Goes here</p>
+
+    <h2>Movies by Category</h2>
+    <input type="text" id="moviCat" size="5" />
+    <input type="button" value="Search" onclick="findByCategory();" />
+
+    <p id="movieCat">Category Stuff Goes Here</p>
+
+    <h2>Add Movies</h2>
+    <input type="text" id="MovieID" size="5" />
+    <input type="text" id="MovieName" size="5" />
+    <input type="text" id="MovieCategory" size="5" />
+    <input type="text" id="MoviePrice" size="5" />
+    <input type="submit" id="AddNewMovie" value="Add movie" onclick="addItem();"/>
+    <ul id="movies2"></ul>
+
+    <script src="http://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.0.js"></script>
+    <script>
+
+        var uri = 'api/movies';
+        $(document).ready(function () {
+            $.getJSON(uri)
+                .done(function (data) {
+                    $.each(data, function (key, item) {
+                        $('<li>', { text: formatItem(item) }).appendTo($('#movies'));
+                    });
+                });
+        });
+
+        function formatItem(item) {
+            return item.Name + ': $' + item.Price;
+        }
+        function findByCategory() {
+            var moviCatString = $('#moviCat').val();
+            $.getJSON(uri + "?cat=" + moviCatString)
+                .done(function (data) {
+                    $("#movieCat").text(formatItem(data));
+                })
+                .fail(function (jqXHR, textStatus, err) {
+                    $("#movieCat").text('Error: ' + err);
+                });
+        }
+
+        function find() {
+            var id = $('#moviId').val();
+            $.getJSON(uri + "/" + id)
+                .done(function (data) {
+                    $("#movie").text(formatItem(data));
+                })
+                .fail(function (jqXHR, textStatus, err) {
+                    $("#movie").text('Error: ' + err);
+                });
+        }
+
+        function addItem() {
+            var movID = $('#MovieID').val();
+            var movName = $('#MovieName').val();
+            var movCat = $('#MovieCategory').val();
+            var movPrice = $('#MoviePrice').val();
+            $.getJSON(uri + "?id=" + movID + "&name=" + movName + "&category=" + movCat + "&price=" + movPrice)
+            .done(function (data) {
+                $.each(data, function (key, item) {
+                    $('<li>', { text: formatItem(item) }).appendTo($('#movies2'));
+                });
+            });
+        }
+
+  </script>
+</body>
+</html>
